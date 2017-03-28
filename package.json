@@ -1,0 +1,11 @@
+{
+    "name": "CleanOutLoudWeb", "description": "", "version": "0.0.1", "main": "./CleanOutLoudWeb.js", "author": {
+        "name": "hoppe2808", "email": "seb.hop@hotmail.com"
+    }, "keywords": [], "licenses": {
+        "type": "none"
+    }, "repository": {
+        "type": "git", "url": "git://github.com/YOUR_LOGIN/CleanOutLoudWeb.git"
+    }, "bugs": {
+        "url": "http://github.com/YOUR_LOGIN/CleanOutLoudWeb/issues"
+    }
+}
