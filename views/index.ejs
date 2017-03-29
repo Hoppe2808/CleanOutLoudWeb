@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="style.css?version=2">
+        <title> Clean Out Loud</title>
+    </head>
+    <body>
+        <div class="main">
+            <h3><%= title %></h3>
+            <form method="POST" action="/trash">
+                <input type="submit" value="Skraldeindsamling">
+            </form>
+            <br>
+            <form method="POST" action="/users">
+                <input type="submit" value="Brugere">
+            </form>
+            <br>
+            <form method="POST" action="/events">
+                <input type="submit" value="Events">
+            </form>
+            <br>
+            <form method="POST" action="/quiz">
+                <input type="submit" value="Quiz">
+            </form>
+            <br>
+            <form method="POST" action="/logout">
+                <input type="submit" value="Log Ud">
+            </form>
+        </div>
+    </body>
+</html>

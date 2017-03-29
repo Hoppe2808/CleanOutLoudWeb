@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="style.css?version=2">
+        <title> Clean Out Loud</title>
+    </head>
+    <body>
+        <div class="main">
+            <h3><%= title %></h3>
+
+            <div class="trashtable">
+	            <table style="width:100%">
+
+	            	<tr>
+	            		<th>Navn</th>
+	            		<th>Skrald samlet (kilo)</th>
+	            	</tr>
+                    <% users.forEach(function(user){ %>
+	            	<tr>
+	            		<td><%= user.name%></td>
+	            		<td><%= user.trash%></td>
+	            	</tr>
+          			<% }) %>
+	            </table>
+            </div>
+            <form method="POST" action="/back">
+                <input type="submit" value="Tilbage">
+            </form>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,43 @@
+body {
+    background-color: lightblue;
+    font-family: Verdana, sans-serif;
+}
+
+.main{
+    margin: 0 auto;
+    width: 100%;
+    text-align: center;
+}
+.trashtable{
+	margin: 0 auto;
+	width: 20%;
+	text-align: center;
+}
+.table{
+	margin: 0 auto;
+	width: 20%;
+	text-align: center;
+}
+table {
+    border-collapse: collapse;
+}
+
+.trashtable table, th, td {
+    border: 1px solid black;
+}
+.trashtable th {
+	height: 50px;
+}
+.calender ul {
+	list-style-type: none;
+}
+.calender {
+    margin: 0 auto;
+	width: 80%;
+}
+.calender li {
+    display: inline-block;
+    width: 10%;
+    color: #666;
+    text-align: center;
+}
