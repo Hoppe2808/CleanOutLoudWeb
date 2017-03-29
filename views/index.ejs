@@ -2,30 +2,33 @@
 <html>
     <head>
         <link rel="stylesheet" type="text/css" href="style.css?version=2">
+        <link href='//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css', rel='stylesheet'>
         <title> Clean Out Loud</title>
     </head>
     <body>
-        <div class="main">
+        <div class="well main">
             <h3><%= title %></h3>
-            <form method="POST" action="/trash">
-                <input type="submit" value="Skraldeindsamling">
-            </form>
-            <br>
-            <form method="POST" action="/users">
-                <input type="submit" value="Brugere">
-            </form>
-            <br>
-            <form method="POST" action="/events">
-                <input type="submit" value="Events">
-            </form>
-            <br>
-            <form method="POST" action="/quiz">
-                <input type="submit" value="Quiz">
-            </form>
-            <br>
-            <form method="POST" action="/logout">
-                <input type="submit" value="Log Ud">
-            </form>
+            <div style="width: 25%; margin: 0 auto; text-align: center">
+	            <form method="POST" action="/trash">
+	                <input class="btn btn-default btn-block" type="submit" value="Skraldeindsamling">
+	            </form>
+	            <br>
+	            <form method="POST" action="/users">
+	                <input class="btn btn-default btn-block" type="submit" value="Brugere">
+	            </form>
+	            <br>
+	            <form method="POST" action="/events">
+	                <input class="btn btn-default btn-block" type="submit" value="Events">
+	            </form>
+	            <br>
+	            <form method="POST" action="/quiz">
+	                <input class="btn btn-default btn-block" type="submit" value="Quiz">
+	            </form>
+	            <br>
+	            <form method="POST" action="/logout">
+	                <input class="btn btn-default btn-block" type="submit" value="Log Ud">
+	            </form>
+            </div>
         </div>
     </body>
 </html>

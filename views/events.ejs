@@ -2,10 +2,11 @@
 <html>
     <head>
         <link rel="stylesheet" type="text/css" href="style.css?version=2">
+        <link href='//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css', rel='stylesheet'>
         <title> Clean Out Loud</title>
     </head>
     <body>
-        <div class="main">
+        <div class="well main">
             <h3><%= title %></h3>
             <div class="events">
                 <ul class="calender">
@@ -20,7 +21,7 @@
                 </ul>
             </div>
             <form method="POST" action="/back">
-                <input type="submit" value="Tilbage">
+                <input class="btn btn-default" type="submit" value="Tilbage">
             </form>
         </div>
     </body>

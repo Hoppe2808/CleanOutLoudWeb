@@ -10,27 +10,37 @@ var users = [
 	{
 		id: 1,
 		name: "Sebby",
-		trash: 9005
+		pass: "123",
+		trash: 9005,
+		admin: true
 	},
 	{
 		id: 2,
-		name: "Luka",
-		trash: -50
+		name: "Lukas",
+		pass: "1234",
+		trash: -50,
+		admin: false
 	},
 	{
 		id: 3,
 		name: "Magnus",
-		trash: 400
+		pass: "12345",
+		trash: 400,
+		admin: false
 	},
 	{
 		id: 4,
 		name: "Rune",
-		trash: 900
+		pass: "123456",
+		trash: 900,
+		admin: false
 	},
 	{
 		id: 5,
 		name: "Nicki",
-		trash: 2
+		pass: "1234567",
+		trash: 2,
+		admin: false
 	}
 ]
 var question = {
@@ -76,7 +86,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 //Control pages:
 app.get('/', function(req, res){
 	res.render('login', {
-		title: 'Log Ind'
+		title: 'Log Ind',
+		error: ''
 	});
 });
 
@@ -88,7 +99,8 @@ app.post('/trash', function(req, res){
 });
 app.post('/users', function(req, res){
 	res.render('users', {
-		title: "Bruger Menu"
+		title: "Bruger Menu",
+		error: ""
 	});
 });
 app.post('/events', function(req, res){
@@ -108,15 +120,83 @@ app.post('/back', function(req, res){
 	});
 });
 app.post('/login', function(req, res){
-	res.render('index', {
-		title: "Hovedmenu"
-	});
+	var uname = req.body.username;
+	var pass = req.body.password;
+	var bool = false;
+	var error = "";
+	if(uname === "" && pass === ""){
+		error = "Indtast venlisgt et gyligt brugernavn og adgangskode.."
+	}else{
+		users.forEach(function(user){
+			if(user.name.toLowerCase() == uname){
+				if(user.pass == pass){
+					bool = true;
+				}else{
+					error = "Ugyldig information..";
+				}
+			}else{
+				error = "Ugyldig information..";
+			}
+		});
+	}
+	console.log(error);
+	if(bool){
+		res.render('index', {
+			title: "Hovedmenu"
+		});		
+	}else{
+		res.render('login', {
+			title: "Log Ind",
+			error: error
+		});
+	}
 });
 app.post('/logout', function(req, res){
 	res.render('login', {
-		title: "Log Ind"
+		title: "Log Ind",
+		error: ""
 	});
 });
+app.post('/users', function(req, res){
+	var uname = req.body.username;
+	var pass = req.body.password;
+	var admin = req.body.admin;
+	var bool = false;
+	var error = "";
+	if(uname === "" && pass === ""){
+		error = "Indtast venlisgt et brugernavn og adgangskode.."
+	}else{
+		users.forEach(function(user){
+			if(user.name.toLowerCase() == uname){
+				error = "Brugernavn findes allerede";
+			}else{
+				var id = users.length;
+				var newUser = {
+					id: id,
+					name: uname,
+					pass: pass,
+					trash: 0,
+					admin: admin
+
+				}
+				users.push(newUser);
+				error = "Bruger Oprettet.."
+			}
+		});
+	}
+	res.render('users', {
+		title: "Bruger Menu",
+		error: error
+	});
+})
+app.post('/quiz/answer',function(req, res){
+	var answer = req.body.ans;
+	console.log(answer);
+		res.render('quiz', {
+		title: "Quiz Menu",
+		question: question
+	});
+})
 
 //Listen on serverport:
 app.listen(3000, function(){
