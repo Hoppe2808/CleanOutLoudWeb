@@ -170,8 +170,10 @@ app.post('/users', function(req, res){
 		users.forEach(function(user){
 			if(user.name.toLowerCase() == uname.toLowerCase()){
 				error = "Brugernavn findes allerede";
+				console.log("User exists");
 			}else if(pass != repass){
 				error = "Adgangskoden stemmer ikke overens.. Prøv igen!";
+				console.log("Passwords are not the same");
 			}else{
 				var id = users.length;
 				var newUser = {
@@ -184,6 +186,7 @@ app.post('/users', function(req, res){
 				}
 				users.push(newUser);
 				error = "Bruger Oprettet..";
+				console.log("Success, user created");
 			}
 		});
 	}
