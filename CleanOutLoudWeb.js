@@ -97,12 +97,6 @@ app.post('/trash', function(req, res){
 		users: users
 	});
 });
-app.post('/users', function(req, res){
-	res.render('users', {
-		title: "Bruger Menu",
-		error: ""
-	});
-});
 app.post('/events', function(req, res){
 	res.render('events', {
 		title: "Events Menu"
@@ -157,7 +151,7 @@ app.post('/logout', function(req, res){
 		error: ""
 	});
 });
-app.post('/users/create', function(req, res){
+app.post('/users', function(req, res){
 	var uname = req.body.username;
 	var pass = req.body.password;
 	var repass = req.body.repassword;
@@ -165,7 +159,6 @@ app.post('/users/create', function(req, res){
 	var bool = true;
 	var error = "";
 	if(uname === "" && pass === ""){
-		error = "Indtast venlisgt et brugernavn og adgangskode..";
 		console.log("No input entered");
 	}else{
 		users.forEach(function(user){
@@ -178,7 +171,7 @@ app.post('/users/create', function(req, res){
 		if(pass != repass){
 			error = "Adgangskoden stemmer ikke overens.. Prøv igen!";
 			console.log("Passwords are not the same");
-		}else{
+		}else if (bool){
 			var id = users.length;
 			var newUser = {
 				id: id,
