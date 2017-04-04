@@ -160,15 +160,18 @@ app.post('/logout', function(req, res){
 app.post('/users', function(req, res){
 	var uname = req.body.username;
 	var pass = req.body.password;
+	var repass = req.body.repassword;
 	var admin = req.body.admin;
 	var bool = false;
 	var error = "";
 	if(uname === "" && pass === ""){
-		error = "Indtast venlisgt et brugernavn og adgangskode.."
+		error = "Indtast venlisgt et brugernavn og adgangskode..";
 	}else{
 		users.forEach(function(user){
-			if(user.name.toLowerCase() == uname){
+			if(user.name.toLowerCase() == uname.toLowerCase()){
 				error = "Brugernavn findes allerede";
+			}else if(pass != repass){
+				error = "Adgangskoden stemmer ikke overens.. Prøv igen!";
 			}else{
 				var id = users.length;
 				var newUser = {
@@ -180,7 +183,7 @@ app.post('/users', function(req, res){
 
 				}
 				users.push(newUser);
-				error = "Bruger Oprettet.."
+				error = "Bruger Oprettet..";
 			}
 		});
 	}
@@ -188,7 +191,7 @@ app.post('/users', function(req, res){
 		title: "Bruger Menu",
 		error: error
 	});
-})
+});
 app.post('/quiz/answer',function(req, res){
 	var answer = req.body.ans;
 	console.log(answer);
@@ -196,7 +199,7 @@ app.post('/quiz/answer',function(req, res){
 		title: "Quiz Menu",
 		question: question
 	});
-})
+});
 
 //Listen on serverport:
 app.listen(3000, 'ec2-52-43-233-138.us-west-2.compute.amazonaws.com' ,function(){
