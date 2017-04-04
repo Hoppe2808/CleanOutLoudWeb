@@ -157,38 +157,41 @@ app.post('/logout', function(req, res){
 		error: ""
 	});
 });
-app.post('/users', function(req, res){
+app.post('/users/create', function(req, res){
 	var uname = req.body.username;
 	var pass = req.body.password;
 	var repass = req.body.repassword;
 	var admin = req.body.admin;
-	var bool = false;
+	var bool = true;
 	var error = "";
 	if(uname === "" && pass === ""){
 		error = "Indtast venlisgt et brugernavn og adgangskode..";
+		console.log("No input entered");
 	}else{
 		users.forEach(function(user){
 			if(user.name.toLowerCase() == uname.toLowerCase()){
 				error = "Brugernavn findes allerede";
 				console.log("User exists");
-			}else if(pass != repass){
-				error = "Adgangskoden stemmer ikke overens.. Prøv igen!";
-				console.log("Passwords are not the same");
-			}else{
-				var id = users.length;
-				var newUser = {
-					id: id,
-					name: uname,
-					pass: pass,
-					trash: 0,
-					admin: admin
-
-				}
-				users.push(newUser);
-				error = "Bruger Oprettet..";
-				console.log("Success, user created");
+				bool = false;
 			}
 		});
+		if(pass != repass){
+			error = "Adgangskoden stemmer ikke overens.. Prøv igen!";
+			console.log("Passwords are not the same");
+		}else{
+			var id = users.length;
+			var newUser = {
+				id: id,
+				name: uname,
+				pass: pass,
+				trash: 0,
+				admin: admin
+
+			}
+			users.push(newUser);
+			error = "Bruger Oprettet..";
+			console.log("Success, user created");
+		}
 	}
 	res.render('users', {
 		title: "Bruger Menu",
