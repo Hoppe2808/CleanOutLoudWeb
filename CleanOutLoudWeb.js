@@ -128,7 +128,7 @@ app.post('/login', function(req, res){
 		error = "Indtast venlisgt et gyligt brugernavn og adgangskode.."
 	}else{
 		users.forEach(function(user){
-			if(user.name.toLowerCase() == uname){
+			if(user.name.toLowerCase() == uname.toLowerCase()){
 				if(user.pass == pass){
 					bool = true;
 				}else{
