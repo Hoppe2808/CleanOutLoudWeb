@@ -83,6 +83,12 @@ app.use(expressValidator({
 //Set static path
 app.use(express.static(path.join(__dirname, 'public')));
 
+//Global vars
+app.use(function(req, res, next){
+	res.locals.error = null;
+	next();
+});
+
 //Control pages:
 app.get('/', function(req, res){
 	res.render('login', {
@@ -97,6 +103,18 @@ app.post('/trash', function(req, res){
 		users: users
 	});
 });
+app.get('/users', function(req, res){
+	res.render('users', {
+		title: "Bruger Menu",
+		error: error
+	});
+});
+app.post('/users', function(req, res){
+	res.render('users', {
+		title: "Bruger Menu",
+		error: ""
+	});
+});
 app.post('/events', function(req, res){
 	res.render('events', {
 		title: "Events Menu"
@@ -106,6 +124,13 @@ app.post('/quiz', function(req, res){
 	res.render('quiz', {
 		title: "Quiz Menu",
 		question: question
+	});
+});
+app.get('/quiz', function(req, res){
+	res.render('quiz', {
+		title: "Quiz Menu",
+		question: question,
+		error: error
 	});
 });
 app.post('/back', function(req, res){
@@ -151,14 +176,14 @@ app.post('/logout', function(req, res){
 		error: ""
 	});
 });
-app.post('/users', function(req, res){
+app.post('/users/create', function(req, res){
 	var uname = req.body.username;
 	var pass = req.body.password;
 	var repass = req.body.repassword;
 	var admin = req.body.admin;
 	var bool = true;
-	var error = "";
 	if(uname === "" && pass === ""){
+		error = "Indtast venlisgt et brugernavn og adgangskode..";
 		console.log("No input entered");
 	}else{
 		users.forEach(function(user){
@@ -186,21 +211,16 @@ app.post('/users', function(req, res){
 			console.log("Success, user created");
 		}
 	}
-	res.render('users', {
-		title: "Bruger Menu",
-		error: error
-	});
+	res.redirect('/users');
 });
 app.post('/quiz/answer',function(req, res){
 	var answer = req.body.ans;
+	error = "Tak for svaret";
 	console.log(answer);
-		res.render('quiz', {
-		title: "Quiz Menu",
-		question: question
-	});
+	res.redirect('/quiz');
 });
 
 //Listen on serverport:
-app.listen(3000, 'ec2-52-43-233-138.us-west-2.compute.amazonaws.com' ,function(){
+app.listen(3000, ec2-52-43-233-138.us-west-2.compute.amazonaws.com,function(){
 	console.log("Server started on port 3000...")
 });
