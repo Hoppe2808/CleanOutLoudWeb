@@ -3,8 +3,14 @@ var bodyParser = require('body-parser');
 var path = require('path');
 var expressValidator = require('express-validator');
 var soap = require('soap');
-
+var url = 'http://ec2-52-43-233-138.us-west-2.compute.amazonaws.com:3769/col?wsdl';
 var app = express();
+console.log("Hejsa TESTES");
+soap.createClient(url, function(err, client){
+	client.getWallMessages("", function(err, result){
+		console.log(result);
+	});
+});
 
 //Get data from database here:
 var users = [
