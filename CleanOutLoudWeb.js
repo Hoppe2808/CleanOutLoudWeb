@@ -144,7 +144,7 @@ app.post('/login', function(req, res){
 	var bool = false;
 	var error = "";
 	if(uname === "" && pass === ""){
-		error = "Indtast venlisgt et gyligt brugernavn og adgangskode.."
+		error = "Indtast venlisgt et gyligt brugernavn og adgangskode..";
 	}else{
 		users.forEach(function(user){
 			if(user.name.toLowerCase() == uname.toLowerCase()){
