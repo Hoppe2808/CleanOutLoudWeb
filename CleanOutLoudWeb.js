@@ -221,6 +221,6 @@ app.post('/quiz/answer',function(req, res){
 });
 
 //Listen on serverport:
-app.listen(3000, ec2-52-43-233-138.us-west-2.compute.amazonaws.com,function(){
-	console.log("Server started on port 3000...")
+app.listen(3000, function(){
+	console.log("Server started on port 3000...");
 });
