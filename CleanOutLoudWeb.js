@@ -2,53 +2,57 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var path = require('path');
 var expressValidator = require('express-validator');
+
+var app = express();
+
 var soap = require('soap');
 var url = 'http://ec2-52-43-233-138.us-west-2.compute.amazonaws.com:3769/col?wsdl';
-var app = express();
-console.log("Hejsa TESTES");
+
 soap.createClient(url, function(err, client){
 	client.getWallMessages("", function(err, result){
-		console.log(result);
+		var convertUser = JSON.stringify(result.user);
+		//var object = JSON.parse(convertUser);
+		console.log(convertUser);
 	});
 });
 
 //Get data from database here:
 var users = [
-	{
-		id: 1,
-		name: "Sebby",
-		pass: "123",
-		trash: 9005,
-		admin: true
-	},
-	{
-		id: 2,
-		name: "Lukas",
-		pass: "1234",
-		trash: -50,
-		admin: false
-	},
-	{
-		id: 3,
-		name: "Magnus",
-		pass: "12345",
-		trash: 400,
-		admin: false
-	},
-	{
-		id: 4,
-		name: "Rune",
-		pass: "123456",
-		trash: 900,
-		admin: false
-	},
-	{
-		id: 5,
-		name: "Nicki",
-		pass: "1234567",
-		trash: 2,
-		admin: false
-	}
+{
+	id: 1,
+	name: "Sebby",
+	pass: "123",
+	trash: 9005,
+	admin: true
+},
+{
+	id: 2,
+	name: "Lukas",
+	pass: "1234",
+	trash: -50,
+	admin: false
+},
+{
+	id: 3,
+	name: "Magnus",
+	pass: "12345",
+	trash: 400,
+	admin: false
+},
+{
+	id: 4,
+	name: "Rune",
+	pass: "123456",
+	trash: 900,
+	admin: false
+},
+{
+	id: 5,
+	name: "Nicki",
+	pass: "1234567",
+	trash: 2,
+	admin: false
+}
 ]
 var question = {
 	desc: "Hvor grim er Lukas?",
@@ -153,27 +157,25 @@ app.post('/login', function(req, res){
 	if(uname === "" && pass === ""){
 		error = "Indtast venlisgt et gyligt brugernavn og adgangskode..";
 	}else{
-		users.forEach(function(user){
-			if(user.name.toLowerCase() == uname.toLowerCase()){
-				if(user.pass == pass){
-					bool = true;
+		var args = {
+			arg0: uname,
+			arg1: pass
+		}
+		soap.createClient(url, function(err, client){
+			client.login(args, function(err, result){
+				error = err;
+				if(err == null){
+					res.render('index', {
+						title: "Hovedmenu"
+					});	
 				}else{
-					error = "Ugyldig information..";
+					res.render('login', {
+						title: "Log Ind",
+						error: error
+					});
+					console.log(error);
 				}
-			}else{
-				error = "Ugyldig information..";
-			}
-		});
-	}
-	console.log(error);
-	if(bool){
-		res.render('index', {
-			title: "Hovedmenu"
-		});		
-	}else{
-		res.render('login', {
-			title: "Log Ind",
-			error: error
+			});
 		});
 	}
 });
