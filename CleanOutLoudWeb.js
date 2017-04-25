@@ -7,7 +7,7 @@ var app = express();
 
 var soap = require('soap');
 var url = 'http://ec2-52-43-233-138.us-west-2.compute.amazonaws.com:3769/col?wsdl';
-/*
+
 soap.createClient(url, function(err, client){
 	client.getWallMessages("", function(err, result){
 		var convertUser = JSON.stringify(result.user);
@@ -15,45 +15,10 @@ soap.createClient(url, function(err, client){
 		console.log(convertUser);
 	});
 });
-*/
+
 //Get data from database here:
-var users = [
-{
-	id: 1,
-	name: "Sebby",
-	pass: "123",
-	trash: 9005,
-	admin: true
-},
-{
-	id: 2,
-	name: "Lukas",
-	pass: "1234",
-	trash: -50,
-	admin: false
-},
-{
-	id: 3,
-	name: "Magnus",
-	pass: "12345",
-	trash: 400,
-	admin: false
-},
-{
-	id: 4,
-	name: "Rune",
-	pass: "123456",
-	trash: 900,
-	admin: false
-},
-{
-	id: 5,
-	name: "Nicki",
-	pass: "1234567",
-	trash: 2,
-	admin: false
-}
-]
+var token = "";
+var error = "";
 var question = {
 	desc: "Hvor grim er Lukas?",
 	ans1: "Meget grim",
@@ -96,7 +61,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //Global vars
 app.use(function(req, res, next){
-	res.locals.error = null;
+	res.locals.error = "";
 	next();
 });
 
@@ -153,9 +118,13 @@ app.post('/login', function(req, res){
 	var uname = req.body.username;
 	var pass = req.body.password;
 	var bool = false;
-	var error = "";
 	if(uname === "" && pass === ""){
-		error = "Indtast venlisgt et gyligt brugernavn og adgangskode..";
+		error = "Indtast venligst et gyligt brugernavn og adgangskode..";
+		res.render('login', {
+			title: "Log Ind",
+			error: error
+		});
+		console.log(error);
 	}else{
 		var args = {
 			arg0: uname,
@@ -164,10 +133,12 @@ app.post('/login', function(req, res){
 		soap.createClient(url, function(err, client){
 			client.login(args, function(err, result){
 				error = err;
+				token = result.return;
 				if(err == null){
 					res.render('index', {
 						title: "Hovedmenu"
 					});	
+					error = "";
 				}else{
 					res.render('login', {
 						title: "Log Ind",
@@ -189,35 +160,41 @@ app.post('/users/create', function(req, res){
 	var uname = req.body.username;
 	var pass = req.body.password;
 	var repass = req.body.repassword;
-	var admin = req.body.admin;
-	var bool = true;
+	var admin = req.body.ans;
+	console.log("HALLor" + admin);
+	if(admin == 1){
+		admin = "user";
+	}else if(admin == 2){
+		admin = "manager";
+	}else{
+		admin = "admin";
+	}
 	if(uname === "" && pass === ""){
-		error = "Indtast venlisgt et brugernavn og adgangskode..";
+		error = "Indtast venligṣt et brugernavn og adgangskode..";
 		console.log("No input entered");
 	}else{
-		users.forEach(function(user){
-			if(user.name.toLowerCase() == uname.toLowerCase()){
-				error = "Brugernavn findes allerede";
-				console.log("User exists");
-				bool = false;
-			}
-		});
 		if(pass != repass){
 			error = "Adgangskoden stemmer ikke overens.. Prøv igen!";
 			console.log("Passwords are not the same");
-		}else if (bool){
-			var id = users.length;
-			var newUser = {
-				id: id,
-				name: uname,
-				pass: pass,
-				trash: 0,
-				admin: admin
-
-			}
-			users.push(newUser);
-			error = "Bruger Oprettet..";
-			console.log("Success, user created");
+		}else{
+			soap.createClient(url, function(err, client){
+				args = {
+					arg0: uname,
+					arg1: pass,
+					arg2: "hulabula",
+					arg3: admin,
+					arg4: token
+				}
+				client.createUser(args, function(err, result){
+					error = err;
+					if(err == null){
+						error = "Bruger Oprettet..";
+						console.log("Success, user created");
+					}else{
+						console.log(err);
+					}
+				});
+			});
 		}
 	}
 	res.redirect('/users');
