@@ -7,7 +7,7 @@ var app = express();
 
 var soap = require('soap');
 var url = 'http://ec2-52-43-233-138.us-west-2.compute.amazonaws.com:3769/col?wsdl';
-
+/*
 soap.createClient(url, function(err, client){
 	client.getWallMessages("", function(err, result){
 		var convertUser = JSON.stringify(result.user);
@@ -15,7 +15,7 @@ soap.createClient(url, function(err, client){
 		console.log(convertUser);
 	});
 });
-
+*/
 //Get data from database here:
 var users = [
 {
