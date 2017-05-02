@@ -291,6 +291,7 @@ app.post('/login', function(req, res){
 	}
 });
 app.post('/logout', function(req, res){
+	token = "";
 	res.render('login', {
 		title: "Log Ind",
 		error: ""
