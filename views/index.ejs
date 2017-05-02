@@ -9,21 +9,25 @@
         <div class="well main">
             <h3><%= title %></h3>
             <div style="width: 25%; margin: 0 auto; text-align: center">
+	            <form method="POST" action="/wall">
+	                <input class="btn btn-default btn-block" type="submit" value="Væg">
+	            </form>
+	            <br>
 	            <form method="POST" action="/trash">
 	                <input class="btn btn-default btn-block" type="submit" value="Skraldeindsamling">
 	            </form>
 	            <br>
+	            <% if (permission == "admin"){ %>
 	            <form method="POST" action="/users">
 	                <input class="btn btn-default btn-block" type="submit" value="Brugere">
 	            </form>
+	            <% } %>
 	            <br>
-	            <form method="POST" action="/events">
-	                <input class="btn btn-default btn-block" type="submit" value="Events">
+	            <% if (permission == "admin"){ %>
+	            <form method="POST" action="/camp">
+	                <input class="btn btn-default btn-block" type="submit" value="Camps">
 	            </form>
-	            <br>
-	            <form method="POST" action="/quiz">
-	                <input class="btn btn-default btn-block" type="submit" value="Quiz">
-	            </form>
+	            <% } %>
 	            <br>
 	            <form method="POST" action="/logout">
 	                <input class="btn btn-default btn-block" type="submit" value="Log Ud">

@@ -24,13 +24,30 @@
                     <input class="form-control" type="password" name="repassword" placeholder="Gen-Indtast Adgangskode">
                 </div>
                 <br><br>
-                <div style="margin: 0 auto; width:15%" class="checkbox">
-                    <label><input type="checkbox" value="">Administrator</label>
+                <% if (token != "") { %>
+                <div style="margin: 0 auto; width:25%" class="checkbox">
+                <table class="table table-bordered">
+                    <tr>
+                        <td>Bruger</td>
+                        <td><input type="radio" name="ans" value="1"></td>
+                    </tr>  
+                    <tr>
+                        <td>Administrator</td>
+                        <td><input type="radio" name="ans" value="2"></td>
+                    </tr>
+                </table>
                 </div>
-                <br><br>
+                <br><% } %>
                 <input class="btn btn-success" type="submit" value="Opret bruger">
+            </form><% if (token != "") { %>
+            <hr style="border-top: 1px solid #8c8b8b">
+            <h4>Slet bruger</h4>
+            <form method="POST" action="/deleteUser">
+                <input class="form-control" type="text" name="username" placeholder="Brugernavn" style="width: 50%; margin: 0 auto">
+                <br>
+                <input class="btn btn-danger" type="submit" value="Slet">  
             </form>
-            <br>
+            <br><% } %>
             <form method="POST" action="/back">
                 <input class="btn btn-default" type="submit" value="Tilbage">
             </form><br><br>

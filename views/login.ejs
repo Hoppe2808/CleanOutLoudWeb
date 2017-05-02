@@ -20,9 +20,13 @@
                 </div>
                 <br><br>
                 <input class="btn btn-success" type="submit" value="Log Ind">
-                <br><br>
-                <label><%= error %></label>
             </form>
+            <br>
+            <form method="POST" action="/users">
+                <input class="btn btn-success" type="submit" value="Opret Bruger">
+                <br><br>
+            </form>
+                <label><%= error %></label>
         </div>
     </body>
 </html>

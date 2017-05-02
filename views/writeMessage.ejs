@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="style.css?version=2">
+        <link href='//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css', rel='stylesheet'>
+        <title> Clean Out Loud</title>
+    </head>
+    <body>
+        <div class="well main">
+            <h3><%= title %></h3>
+            <label>Kommende begivenheder:</label><br>
+            <div class="write">
+                <form method="POST" action="/writeMessage/submit">
+                <label for="message">Besked:</label>
+                <textarea class="form-control" rows="10" id="message" name="message"></textarea>
+                <input class="btn btn-success" type="submit" value="Send besked">
+                </form>
+            </div><br>
+            <form method="POST" action="/back">
+                <input class="btn btn-default" type="submit" value="Tilbage">
+            </form>
+            <br><br>
+            <label><%= error %></label>
+        </div>
+    </body>
+</html>

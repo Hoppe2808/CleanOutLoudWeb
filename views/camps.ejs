@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="style.css?version=2">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+        <title> Clean Out Loud</title>
+    </head>
+    <body>
+        <div class="well main">
+            <h3><%= title %></h3>
+            <br>
+            <h4>Slet camp</h4>
+            <form method="POST" action="/deleteCamp">
+                <label>Camp:
+                <select class="selectpicker" name="selectpicker">
+                    <% for (var i = 0; i < camps.length; i++) { %>
+                        <option><%= camps[i] %></option>
+                    <% } %>
+                </select></label>
+                <br>
+                <input class="btn btn-danger" type="submit" value="Slet">  
+            </form>
+            <br><br>
+            <h4>Opret camp</h4>
+            <div style="width: 50%; margin: 0 auto;">
+            <form method="POST" action="/createCamp">
+                <label for="name">Navn på camp:</label>
+                <input type="text" class="form-control" id="name" name="name">
+                <br>
+                <input class="btn btn-success" type="submit" value="Opret">  
+            </form>
+            </div>
+            <br>
+            <form method="POST" action="/back">
+                <input class="btn btn-default" type="submit" value="Tilbage">
+            </form>
+            <br><br>
+            <label><%= error %></label>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="style.css?version=2">
+        <link href='//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css', rel='stylesheet'>
+        <title> Clean Out Loud</title>
+    </head>
+    <body>
+        <div class="well main">
+            <h3><%= title %></h3>
+            <label>Seneste beskeder:</label><br>
+            <div class="walltable">
+                <form method="POST" action="/writeMessage">
+                <table class="table table-bordered">
+                    <tr>
+                        <th style="text-align: center">Beskeder</th>
+                        <th style="text-align: center">Dato</th>
+                    </tr>
+                    <% for (var i = 0; i < messages.length; i++) { %>
+                    <tr>
+                        <td><%= messages[i] %></td>
+                        <td><%= dates[i] %></td>
+                    </tr>    
+                    <% } %>
+                </table><br>
+                <input class="btn btn-success" type="submit" value="Skriv besked">
+                </form>
+            </div><br>
+            <form method="POST" action="/back">
+                <input class="btn btn-default" type="submit" value="Tilbage">
+            </form>
+            <br><br>
+            <label><%= error %></label>
+        </div>
+    </body>
+</html>
