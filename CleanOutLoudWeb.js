@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var path = require('path');
 var expressValidator = require('express-validator');
+var $ = require('jquery');
 
 var app = express();
 
@@ -12,11 +13,15 @@ var url = 'http://ec2-52-43-233-138.us-west-2.compute.amazonaws.com:3769/col?wsd
 var token = "";
 var error = "";
 var messages = [];
+var messageID = [];
 var dates = [];
 var user = {};
 var users = [];
 var camps = [];
 var weight = [];
+var comments = [];
+var id = 0;
+
 
 //Setup for various frameworks:
 
@@ -72,6 +77,7 @@ app.post('/wall', function(req, res){
 	error = "";
 	res.render('wall', {
 		title: "Væg",
+		messageID: messageID,
 		messages: messages,
 		dates: dates,
 		error: error
@@ -357,31 +363,61 @@ app.post('/quiz/answer',function(req, res){
 	console.log(answer);
 	res.redirect('/quiz');
 });
+app.post('/comments',function(req, res){
+	id = req.body.message;
+	args = {
+		arg0: id
+	}
+	soap.createClient(url, function(err, client){
+		client.getCommentsForMessage(args, function(err, result){
+			error = err;
+			if(result != null){
+				var json = result.return;
+				for (var i = 0; i < json.length; i++) {
+					comments[i] = json[i].text;
+				}
+			}
+			console.log("Comments for message recieved...");
+		});
+	});
+});
+app.get('/singleMessage.ejs', function(req, res){
+	console.log(token);
+	args = {
+		arg0: id
+	}
+	soap.createClient(url, function(err, client){
+		client.getMessage(args, function(err, result){
+			var message = result.return.text;
+			console.log(comments.length);
+			res.render('singleMessage', {
+				title: "Kommentarer",
+				message: message,
+				comments: comments,
+				error: error
+			});
+		});
+	});
+});
+app.post('/singleMessage.ejs', function(req, res){
+	var comment = req.body.message;
+	args = {
+		arg0: comment,
+		arg1: id,
+		arg2: token
+	}
+});
 function getMessages(res){
 	soap.createClient(url, function(err, client){
 		client.getWallMessages("", function(err, result){
 			error = err;
 			var json = result;
 			for (var i = 0; i < json.return.length; i++) {
+				messageID[i] = json.return[i].messageId;
 				messages[i] = json.return[i].text;
 				dates[i] = json.return[i].date;
 			}
 			console.log("Wall messages recieved...");
-		});
-	});
-}
-function updateCamps(){
-	soap.createClient(url, function(err, client){
-		client.getCampsSortedInWeight("", function(err, result){
-			error = err;
-			if(error = null){
-				console.log("Camps recieved...");
-			}
-			var json = result;
-			for (var i = 0; i < json.return.length; i++) {
-				camps[i] = json.return[i].campName;
-				weight[i] = json.return[i].garbageWeight;
-			}
 		});
 	});
 }
