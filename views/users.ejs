@@ -47,10 +47,13 @@
                 <br>
                 <input class="btn btn-danger" type="submit" value="Slet">  
             </form>
-            <br><% } %>
+            <br>
             <form method="POST" action="/back">
                 <input class="btn btn-default" type="submit" value="Tilbage">
-            </form><br><br>
+            </form><% } %><br><br>
+            <form method="POST" action="/">
+                <input class="btn btn-default" type="submit" value="Tilbage">
+            </form>
             <label><%= error %></label>
         </div>
     </body>

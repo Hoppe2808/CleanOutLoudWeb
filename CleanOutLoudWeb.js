@@ -271,10 +271,20 @@ app.post('/login', function(req, res){
 				if(err == null){
 					getMessages(res);
 					client.getUser(args, function(err, result){
-						user = result.return;
+						error = err;
+						if(error != null){
+							user = result.return;	
+						}
+						var type = "";
+						if(user == null){
+							type = "admin";
+						}else{
+							type = user.userType;
+						}
+
 						res.render('index', {
 							title: "Hovedmenu",
-							permission: user.userType
+							permission: type
 						});	
 						console.log("User %s logged in...", user.userName);
 					});
