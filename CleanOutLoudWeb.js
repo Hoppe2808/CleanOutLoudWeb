@@ -272,7 +272,7 @@ app.post('/login', function(req, res){
 					getMessages(res);
 					client.getUser(args, function(err, result){
 						error = err;
-						if(error != null){
+						if(error == null){
 							user = result.return;	
 						}
 						var type = "";
