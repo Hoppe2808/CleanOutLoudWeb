@@ -46,10 +46,15 @@
                 <input class="form-control" type="text" name="username" placeholder="Brugernavn" style="width: 50%; margin: 0 auto">
                 <br>
                 <input class="btn btn-danger" type="submit" value="Slet">  
-            </form><% } %><br><br>
+            </form><br><br>
             <form method="POST" action="/back">
                 <input class="btn btn-default" type="submit" value="Tilbage">
+            </form><% }else{ %>
+            <br><br>
+            <form method="POST" action="/backLogin">
+                <input class="btn btn-default" type="submit" value="Tilbage">
             </form>
+            <% } %>
             <label><%= error %></label>
         </div>
     </body>

@@ -77,6 +77,12 @@ app.get('/', function(req, res){
 		error: ''
 	});
 });
+app.post('/backLogin', function(req, res){
+	res.render('login', {
+		title: 'Log Ind',
+		error: ''
+	});
+});
 app.get('/index', function(req, res){
 	res.render('index', {
 		title: 'Hovedmenu',
@@ -84,15 +90,48 @@ app.get('/index', function(req, res){
 	});
 });
 app.post('/wall', function(req, res){
-	console.log(sess);
 	sess.error = "";
-	res.render('wall', {
-		title: "Væg",
-		messageID: sess.messageID,
-		messages: sess.messages,
-		dates: sess.dates,
-		error: sess.error
-	});	
+	soap.createClient(url, function(err, client){
+		client.getWallMessages("", function(err, result){
+			sess.error = err;
+			var json = result;
+			for (var i = 0; i < json.return.length; i++) {
+				sess.messageID[i] = json.return[i].messageId;
+				sess.messages[i] = json.return[i].text;
+				sess.dates[i] = json.return[i].date;
+			}
+			console.log("Wall messages recieved...");
+			res.render('wall', {
+				title: "Væg",
+				messageID: sess.messageID,
+				messages: sess.messages,
+				dates: sess.dates,
+				error: sess.error
+			});	
+		});
+	});
+});
+app.get('/wall', function(req, res){
+	sess.error = "";
+	soap.createClient(url, function(err, client){
+		client.getWallMessages("", function(err, result){
+			sess.error = err;
+			var json = result;
+			for (var i = 0; i < json.return.length; i++) {
+				sess.messageID[i] = json.return[i].messageId;
+				sess.messages[i] = json.return[i].text;
+				sess.dates[i] = json.return[i].date;
+			}
+			console.log("Wall messages recieved...");
+			res.render('wall', {
+				title: "Væg",
+				messageID: sess.messageID,
+				messages: sess.messages,
+				dates: sess.dates,
+				error: sess.error
+			});	
+		});
+	});
 });
 app.post('/writeMessage', function(req, res){
 	res.render('writeMessage', {
@@ -110,8 +149,7 @@ app.post('/writeMessage/submit', function(req, res){
 			sess.error = err;
 			console.log(err);
 			if(err == null){
-				getMessages(res);
-				res.redirect('/index');	
+				res.redirect('/wall');	
 			}
 		});
 	});
@@ -178,20 +216,34 @@ app.post('/trash/add', function(req, res){
 	});
 });
 app.get('/users', function(req, res){
-	res.render('users', {
-		title: "Bruger Menu",
-		users: sess.users,
-		token: sess.token,
-		error: sess.error
-	});
+	if (sess){
+		res.render('users', {
+			title: "Bruger Menu",
+			token: sess.token,
+			error: ""
+		});
+	}else{
+		res.render('users', {
+			title: "Bruger Menu",
+			token: "",
+			error: ""
+		});
+	}
 });
 app.post('/users', function(req, res){
-	res.render('users', {
-		title: "Bruger Menu",
-		users: sess.users,
-		token: sess.token,
-		error: ""
-	});
+	if (sess){
+		res.render('users', {
+			title: "Bruger Menu",
+			token: sess.token,
+			error: ""
+		});
+	}else{
+		res.render('users', {
+			title: "Bruger Menu",
+			token: "",
+			error: ""
+		});
+	}
 });
 app.post('/deleteUser', function(req, res){
 	soap.createClient(url, function(err, client){
@@ -302,7 +354,6 @@ app.post('/login', function(req, res){
 				sess.token = result.return;
 				args.arg1 = sess.token;
 				if(err == null){
-					getMessages(res);
 					client.getUser(args, function(err, result){
 						sess.error = err;
 						if(sess.error == null){
@@ -320,8 +371,6 @@ app.post('/login', function(req, res){
 							permission: type
 						});	
 						console.log("User %s logged in...", sess.user.userName);
-						console.log(req.sessionID);
-
 					});
 					sess.error = "";
 				}else{
@@ -336,10 +385,17 @@ app.post('/login', function(req, res){
 	}
 });
 app.post('/logout', function(req, res){
-	sess.destroy();
-	res.render('login', {
-		title: "Log Ind",
-		error: ""
+	sess.destroy(function(err){
+		res.clearCookie('connect.sid', { path: '/' });
+		sess = null;
+		if (err != null){
+			console.log(err);
+		}else{
+			res.render('login', {
+				title: "Log Ind",
+				error: ""
+			});
+		}
 	});
 });
 app.post('/users/create', function(req, res){
@@ -347,17 +403,26 @@ app.post('/users/create', function(req, res){
 	var pass = req.body.password;
 	var repass = req.body.repassword;
 	var admin = req.body.ans;
+	var token;
+	var error;
+	if(sess){
+		token = sess.token;
+		error = sess.error;
+	}else{
+		token = "";
+		error = "";
+	}
 	if(admin == 1 || admin == null){
 		admin = "user";
 	}else if(admin == 2){
 		admin = "admin";
 	}
 	if(uname === "" && pass === ""){
-		sess.error = "Indtast venligṣt et brugernavn og adgangskode..";
+		error = "Indtast venligṣt et brugernavn og adgangskode..";
 		console.log("No input entered");
 	}else{
 		if(pass != repass){
-			sess.error = "Adgangskoden stemmer ikke overens.. Prøv igen!";
+			error = "Adgangskoden stemmer ikke overens.. Prøv igen!";
 			console.log("Passwords are not the same");
 		}else{
 			soap.createClient(url, function(err, client){
@@ -366,12 +431,12 @@ app.post('/users/create', function(req, res){
 					arg1: pass,
 					arg2: "hulabula",
 					arg3: admin,
-					arg4: sess.token
+					arg4: token
 				}
 				client.createUser(args, function(err, result){
-					sess.error = err;
+					error = err;
 					if(err == null){
-						sess.error = "Bruger Oprettet..";
+						error = "Bruger Oprettet..";
 						console.log("Success, user created");
 					}else{
 						console.log(err);
@@ -380,8 +445,8 @@ app.post('/users/create', function(req, res){
 			});
 		}
 	}
-	if(sess.token == "null"){
-		res.redirect('/login');
+	if(!sess){
+		res.redirect('/backLogin');
 	}else{
 		res.redirect('/users');
 	}
@@ -435,20 +500,9 @@ app.post('/singleMessage.ejs', function(req, res){
 		arg2: sess.token
 	}
 });
-function getMessages(res){
-	soap.createClient(url, function(err, client){
-		client.getWallMessages("", function(err, result){
-			sess.error = err;
-			var json = result;
-			for (var i = 0; i < json.return.length; i++) {
-				sess.messageID[i] = json.return[i].messageId;
-				sess.messages[i] = json.return[i].text;
-				sess.dates[i] = json.return[i].date;
-			}
-			console.log("Wall messages recieved...");
-		});
-	});
-}
+app.post('/singleMessage/submit', function(req, res){
+	
+});
 //Listen on serverport:
 app.listen(3000, function(){
 	console.log("Server started on port 3000...");
