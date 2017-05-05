@@ -4,6 +4,7 @@ var path = require('path');
 var expressValidator = require('express-validator');
 var $ = require('jquery');
 var session = require('express-session');
+var MySQLStore = require('express-mysql-session')(session);
 
 var app = express();
 
@@ -42,10 +43,24 @@ app.use(expressValidator({
 app.use(express.static(path.join(__dirname, 'public')));
 
 //Session setup
+var options = {
+    host: 'col.cpqpebpi6pjl.us-west-2.rds.amazonaws.com',
+    port: 3306,
+    user: 'g17',
+    password: 'distg17col',
+    database: 'NodeStore'
+};
+
+var sessionStore = new MySQLStore(options);
+
 app.use(session({
 	secret: 'ssshhhhh',
-  	resave: false,
-  	saveUninitialized: true}
+	store: sessionStore,
+  	resave: true,
+  	saveUninitialized: true,
+  	cookie: {
+  		maxAge: 68000
+  	}}
 ));
 
 //Global vars
@@ -69,6 +84,7 @@ app.get('/index', function(req, res){
 	});
 });
 app.post('/wall', function(req, res){
+	console.log(sess);
 	sess.error = "";
 	res.render('wall', {
 		title: "Væg",
@@ -268,10 +284,8 @@ app.post('/login', function(req, res){
 			client.login(args, function(err, result){
 
 				//Create new session
-				sess=req.session;
-				if(sess.token){
+				sess = req.session;
 
-				}
 				sess.token = "";
 				sess.error = "";
 				sess.messages = [];
@@ -283,7 +297,6 @@ app.post('/login', function(req, res){
 				sess.weight = [];
 				sess.comments = [];
 				sess.singleID = 0;
-
 
 				sess.error = err;
 				sess.token = result.return;
@@ -307,6 +320,8 @@ app.post('/login', function(req, res){
 							permission: type
 						});	
 						console.log("User %s logged in...", sess.user.userName);
+						console.log(req.sessionID);
+
 					});
 					sess.error = "";
 				}else{
@@ -321,7 +336,7 @@ app.post('/login', function(req, res){
 	}
 });
 app.post('/logout', function(req, res){
-	sess.token = "";
+	sess.destroy();
 	res.render('login', {
 		title: "Log Ind",
 		error: ""
