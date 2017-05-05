@@ -20,13 +20,6 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
-//Session setup
-app.use(session({
-	secret: 'ssshhhhh',
-  	resave: false,
-  	saveUninitialized: true}
-));
-
 //Express-validator middelware
 app.use(expressValidator({
 	errorFormatter: function(param, msg, value){
@@ -48,6 +41,13 @@ app.use(expressValidator({
 //Set static path
 app.use(express.static(path.join(__dirname, 'public')));
 
+//Session setup
+app.use(session({
+	secret: 'ssshhhhh',
+  	resave: false,
+  	saveUninitialized: true}
+));
+
 //Global vars
 app.use(function(req, res, next){
 	res.locals.error = "";
@@ -57,18 +57,6 @@ var sess;
 
 //Control pages:
 app.get('/', function(req, res){
-	sess=req.session;
-	sess.token = "";
-	sess.error = "";
-	sess.messages = [];
-	sess.messageID = [];
-	sess.dates = [];
-	sess.user = {};
-	sess.users = [];
-	sess.camps = [];
-	sess.weight = [];
-	sess.comments = [];
-	sess.singleID = 0;
 	res.render('login', {
 		title: 'Log Ind',
 		error: ''
@@ -265,12 +253,12 @@ app.post('/login', function(req, res){
 	var pass = req.body.password;
 	var bool = false;
 	if(uname === "" && pass === ""){
-		sess.error = "Indtast venligst et gyligt brugernavn og adgangskode..";
+		var tempError = "Indtast venligst et gyligt brugernavn og adgangskode..";
 		res.render('login', {
 			title: "Log Ind",
-			error: sess.error
+			error: tempError
 		});
-		console.log(sess.error);
+		console.log(tempError);
 	}else{
 		var args = {
 			arg0: uname,
@@ -278,6 +266,25 @@ app.post('/login', function(req, res){
 		}
 		soap.createClient(url, function(err, client){
 			client.login(args, function(err, result){
+
+				//Create new session
+				sess=req.session;
+				if(sess.token){
+
+				}
+				sess.token = "";
+				sess.error = "";
+				sess.messages = [];
+				sess.messageID = [];
+				sess.dates = [];
+				sess.user = {};
+				sess.users = [];
+				sess.camps = [];
+				sess.weight = [];
+				sess.comments = [];
+				sess.singleID = 0;
+
+
 				sess.error = err;
 				sess.token = result.return;
 				args.arg1 = sess.token;
