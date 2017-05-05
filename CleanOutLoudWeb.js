@@ -337,6 +337,7 @@ app.post('/login', function(req, res){
 
 				//Create new session
 				sess = req.session;
+				sess.name = result.return;
 
 				sess.token = "";
 				sess.error = "";
@@ -386,7 +387,6 @@ app.post('/login', function(req, res){
 });
 app.post('/logout', function(req, res){
 	sess.destroy(function(err){
-		res.clearCookie('connect.sid', { path: '/' });
 		sess = null;
 		if (err != null){
 			console.log(err);
