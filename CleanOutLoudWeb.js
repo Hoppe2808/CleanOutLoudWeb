@@ -482,13 +482,23 @@ app.get('/singleMessage.ejs', function(req, res){
 	}
 	soap.createClient(url, function(err, client){
 		client.getMessage(args, function(err, result){
-			var message = result.return.text;
-			res.render('singleMessage', {
-				title: "Kommentarer",
-				message: message,
-				comments: sess.comments,
-				error: sess.error
-			});
+			if(err == null){
+				var message = result.return.text;
+				res.render('singleMessage', {
+					title: "Kommentarer",
+					message: message,
+					comments: sess.comments,
+					error: sess.error
+				});
+			}else{
+				console.log(err);
+				res.render('singleMessage', {
+					title: "Kommentarer",
+					message: req.body.header,
+					comments: sess.comments,
+					error: err
+				});
+			}
 		});
 	});
 });
