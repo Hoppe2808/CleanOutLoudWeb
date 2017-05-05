@@ -458,7 +458,7 @@ app.post('/quiz/answer',function(req, res){
 	res.redirect('/quiz');
 });
 app.post('/comments',function(req, res){
-	console.log(sess.token);
+	sess.comments = [];
 	sess.singleID = req.body.message;
 	args = {
 		arg0: sess.singleID
@@ -501,7 +501,34 @@ app.post('/singleMessage.ejs', function(req, res){
 	}
 });
 app.post('/singleMessage/submit', function(req, res){
-	
+	args = {
+		arg0: req.body.message,
+		arg1: sess.singleID,
+		arg2: sess.token
+	}
+	soap.createClient(url, function(err, client){
+		client.addComment(args, function(err, result){
+			if (err != null){
+				console.log(err);
+			}else{
+				console.log("Comment uploaded for message with id: " + sess.singleID);
+				args = {
+					arg0: sess.singleID
+				}
+				client.getCommentsForMessage(args, function(err, result){
+					sess.error = err;
+					if(result != null){
+						var json = result.return;
+						for (var i = 0; i < json.length; i++) {
+							sess.comments[i] = json[i].text;
+						}
+						console.log("Comments for message recieved...");
+						res.redirect('/singleMessage.ejs');
+					}
+				});
+			}
+		});
+	});
 });
 //Listen on serverport:
 app.listen(3000, function(){
