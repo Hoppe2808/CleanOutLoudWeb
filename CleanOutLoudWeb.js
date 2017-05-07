@@ -4,7 +4,6 @@ var path = require('path');
 var expressValidator = require('express-validator');
 var $ = require('jquery');
 var session = require('express-session');
-var MySQLStore = require('express-mysql-session')(session);
 
 var app = express();
 
@@ -42,26 +41,14 @@ app.use(expressValidator({
 //Set static path
 app.use(express.static(path.join(__dirname, 'public')));
 
-//Session setup
-var options = {
-    host: 'col.cpqpebpi6pjl.us-west-2.rds.amazonaws.com',
-    port: 3306,
-    user: 'g17',
-    password: 'distg17col',
-    database: 'NodeStore'
-};
-
-var sessionStore = new MySQLStore(options);
-
 app.use(session({
 	secret: 'ssshhhhh',
-	//store: sessionStore,
-  	resave: true,
-  	saveUninitialized: true,
-  	cookie: {
-  		maxAge: 68000
-  	}}
-));
+	resave: true,
+	saveUninitialized: true,
+	cookie: {
+		maxAge: 68000
+	}}
+	));
 
 //Global vars
 app.use(function(req, res, next){
@@ -78,7 +65,7 @@ app.get('/', function(req, res){
 	}else{
 		res.render('login', {
 			title: 'Log Ind',
-			error: ''
+			error: 'Session udløbet'
 		});
 	}
 });
@@ -88,58 +75,85 @@ app.post('/backLogin', function(req, res){
 		error: ''
 	});
 });
+app.get('/backLogin', function(req, res){
+	res.render('login', {
+		title: 'Log Ind',
+		error: ''
+	});
+});
 app.get('/index', function(req, res){
 	sess = req.session;
-	res.render('index', {
-		title: 'Hovedmenu',
-		permission: sess.user.userType
-	});
+	if(sess.token){
+		res.render('index', {
+			title: 'Hovedmenu',
+			permission: sess.user.userType
+		});
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
+	}
 });
 app.post('/wall', function(req, res){
 	sess = req.session;
-	sess.error = "";
-	soap.createClient(url, function(err, client){
-		client.getWallMessages("", function(err, result){
-			sess.error = err;
-			var json = result;
-			for (var i = 0; i < json.return.length; i++) {
-				sess.messageID[i] = json.return[i].messageId;
-				sess.messages[i] = json.return[i].text;
-				sess.dates[i] = json.return[i].date;
-			}
-			console.log("Wall messages recieved...");
-			res.render('wall', {
-				title: "Væg",
-				messageID: sess.messageID,
-				messages: sess.messages,
-				dates: sess.dates,
-				error: sess.error
-			});	
+	if(sess.token){
+		sess.error = "";
+		soap.createClient(url, function(err, client){
+			client.getWallMessages("", function(err, result){
+				sess.error = err;
+				var json = result;
+				for (var i = 0; i < json.return.length; i++) {
+					sess.messageID[i] = json.return[i].messageId;
+					sess.messages[i] = json.return[i].text;
+					sess.dates[i] = json.return[i].date;
+				}
+				console.log("Wall messages recieved...");
+				res.render('wall', {
+					title: "Væg",
+					messageID: sess.messageID,
+					messages: sess.messages,
+					dates: sess.dates,
+					error: sess.error
+				});	
+			});
 		});
-	});
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
+	}
 });
 app.get('/wall', function(req, res){
 	sess = req.session;
-	sess.error = "";
-	soap.createClient(url, function(err, client){
-		client.getWallMessages("", function(err, result){
-			sess.error = err;
-			var json = result;
-			for (var i = 0; i < json.return.length; i++) {
-				sess.messageID[i] = json.return[i].messageId;
-				sess.messages[i] = json.return[i].text;
-				sess.dates[i] = json.return[i].date;
-			}
-			console.log("Wall messages recieved...");
-			res.render('wall', {
-				title: "Væg",
-				messageID: sess.messageID,
-				messages: sess.messages,
-				dates: sess.dates,
-				error: sess.error
-			});	
+	if(sess.token){
+		sess.error = "";
+		soap.createClient(url, function(err, client){
+			client.getWallMessages("", function(err, result){
+				sess.error = err;
+				var json = result;
+				for (var i = 0; i < json.return.length; i++) {
+					sess.messageID[i] = json.return[i].messageId;
+					sess.messages[i] = json.return[i].text;
+					sess.dates[i] = json.return[i].date;
+				}
+				console.log("Wall messages recieved...");
+				res.render('wall', {
+					title: "Væg",
+					messageID: sess.messageID,
+					messages: sess.messages,
+					dates: sess.dates,
+					error: sess.error
+				});	
+			});
 		});
-	});
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
+	}
 });
 app.post('/writeMessage', function(req, res){
 	res.render('writeMessage', {
@@ -148,70 +162,92 @@ app.post('/writeMessage', function(req, res){
 });
 app.post('/writeMessage/submit', function(req, res){
 	sess = req.session;
-	var message = req.body.message;
-	var args = {
-		arg0: message,
-		arg1: sess.token
-	}
-	soap.createClient(url, function(err, client){
-		client.addMessage(args, function(err, result){
-			sess.error = err;
-			console.log(err);
-			if(err == null){
-				res.redirect('/wall');	
-			}
+	if(sess.token){
+		var message = req.body.message;
+		var args = {
+			arg0: message,
+			arg1: sess.token
+		}
+		soap.createClient(url, function(err, client){
+			client.addMessage(args, function(err, result){
+				sess.error = err;
+				console.log(err);
+				if(err == null){
+					res.redirect('/wall');	
+				}
+			});
 		});
-	});
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
+	}
 });
 app.post('/trash', function(req, res){
 	sess = req.session;
-	soap.createClient(url, function(err, client){
-		client.getCampsSortedInWeight("", function(err, result){
-			sess.error = err;
-			if(sess.error = null){
-				console.log("Camps recieved...");
-			}
-			var json = result;
-			for (var i = 0; i < json.return.length; i++) {
-				sess.camps[i] = json.return[i].campName;
-				sess.weight[i] = json.return[i].garbageWeight;
-			}
-			res.render('trash', {
-				title: "Skralde Menu",
-				camps: sess.camps,
-				weight: sess.weight,
-				permission: sess.user.userType,
-				error: sess.error
+	if(sess.token){
+		soap.createClient(url, function(err, client){
+			client.getCampsSortedInWeight("", function(err, result){
+				sess.error = err;
+				if(sess.error = null){
+					console.log("Camps recieved...");
+				}
+				var json = result;
+				for (var i = 0; i < json.return.length; i++) {
+					sess.camps[i] = json.return[i].campName;
+					sess.weight[i] = json.return[i].garbageWeight;
+				}
+				res.render('trash', {
+					title: "Skralde Menu",
+					camps: sess.camps,
+					weight: sess.weight,
+					permission: sess.user.userType,
+					error: sess.error
+				});
 			});
 		});
-	});
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
+	}
 });
 app.get('/trash', function(req, res){
 	sess = req.session;
-	res.render('trash', {
-		title: "Skralde Menu",
-		camps: sess.camps,
-		weight: sess.weight,
-		permission: sess.user.userType,
-		error: sess.error
-	});
+	if(sess.token){
+		res.render('trash', {
+			title: "Skralde Menu",
+			camps: sess.camps,
+			weight: sess.weight,
+			permission: sess.user.userType,
+			error: sess.error
+		});
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
+	}
 });
 app.post('/trash/add', function(req, res){
 	sess = req.session;
-	var camp = req.body.selectpicker;
-	var weightAdded = req.body.weight;
-	args = {
-		arg0: camp,
-		arg1: weightAdded,
-		arg2: sess.token
-	}
-	soap.createClient(url, function(err, client){
-		client.setGarbage(args, function(err, result){
-			sess.error = err;
-			if(sess.error == null){
-				sess.error = "Kilo ændret..";
-			}
-			console.log(error);
+	if(sess.token){
+		var camp = req.body.selectpicker;
+		var weightAdded = req.body.weight;
+		args = {
+			arg0: camp,
+			arg1: weightAdded,
+			arg2: sess.token
+		}
+		soap.createClient(url, function(err, client){
+			client.setGarbage(args, function(err, result){
+				sess.error = err;
+				if(sess.error == null){
+					sess.error = "Kilo ændret..";
+				}
+				console.log(error);
 				client.getCampsSortedInWeight("", function(err, result){
 					sess.error = err;
 					if(sess.error = null){
@@ -224,8 +260,14 @@ app.post('/trash/add', function(req, res){
 					}
 					res.redirect("/trash");
 				});
+			});
 		});
-	});
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
+	}
 });
 app.get('/users', function(req, res){
 	sess = req.session;
@@ -245,19 +287,31 @@ app.get('/users', function(req, res){
 });
 app.post('/users', function(req, res){
 	sess = req.session;
-	if (sess){
-		res.render('users', {
-			title: "Bruger Menu",
-			token: sess.token,
-			error: ""
+	soap.createClient(url, function(err, client){
+		client.getCamps("", function(err, result){
+			sess.error = err;
+			var json = result.return;
+			var camps = [];
+			for (var i = 0; i < json.length; i++) {
+				camps[i] = json[i].campName;
+			}
+			if (sess){
+				res.render('users', {
+					title: "Bruger Menu",
+					token: sess.token,
+					camps: camps,
+					error: ""
+				});
+			}else{
+				res.render('users', {
+					title: "Bruger Menu",
+					token: "",
+					camps: camps,
+					error: ""
+				});
+			}
 		});
-	}else{
-		res.render('users', {
-			title: "Bruger Menu",
-			token: "",
-			error: ""
-		});
-	}
+	});	
 });
 app.post('/deleteUser', function(req, res){
 	soap.createClient(url, function(err, client){
@@ -268,72 +322,116 @@ app.post('/deleteUser', function(req, res){
 });
 app.post('/camp', function(req, res){
 	sess = req.session;
-	soap.createClient(url, function(err, client){
-		client.getCamps("", function(err, result){
-			sess.error = err;
-			var json = result.return;
-			for (var i = 0; i < json.length; i++) {
-				sess.camps[i] = json[i].campName;
-			}
-			res.render('camps', {
-				title: "Camp Menu",
-				camps: sess.camps,
-				error: ""
+	if(sess.token){
+		soap.createClient(url, function(err, client){
+			client.getCamps("", function(err, result){
+				sess.error = err;
+				var json = result.return;
+				for (var i = 0; i < json.length; i++) {
+					sess.camps[i] = json[i].campName;
+				}
+				res.render('camps', {
+					title: "Camp Menu",
+					camps: sess.camps,
+					error: ""
+				});
 			});
+		});	
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
 		});
-	});	
+	}
 });
 app.get('/camp', function(req, res){
 	sess = req.session;
-	res.render('camps', {
-		title: "Camp Menu",
-		camps: sess.camps,
-		error: sess.error
-	});
-});
-app.post('/events', function(req, res){
-	res.render('events', {
-		title: "Events Menu"
-	});
+	if(sess.token){
+		res.render('camps', {
+			title: "Camp Menu",
+			camps: sess.camps,
+			error: sess.error
+		});
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
+	}
 });
 app.post('/back', function(req, res){
 	sess = req.session;
-	res.render('index', {
-		title: "Hovedmenu",
-		permission: sess.user.userType
-	});
+	if(sess.token){
+		res.render('index', {
+			title: "Hovedmenu",
+			permission: sess.user.userType
+		});
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
+	}
+});
+app.get('/back', function(req, res){
+	sess = req.session;
+	if(sess.token){
+		res.render('index', {
+			title: "Hovedmenu",
+			permission: sess.user.userType
+		});
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
+	}
 });
 app.post('/deleteCamp', function(req, res){
 	sess = req.session;
-	var name = req.body.selectpicker;
-	args = {
-		arg0: name,
-		arg1: sess.token
-	}
-	soap.createClient(url, function(err, client){
-		client.deleteCamp(args, function(err, result){
+	if(sess.token){
+		var name = req.body.selectpicker;
+		args = {
+			arg0: name,
+			arg1: sess.token
+		}
+		soap.createClient(url, function(err, client){
+			client.deleteCamp(args, function(err, result){
 
-			res.redirect('/camp');
+				res.redirect('/camp');
+			});
 		});
-	});
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
+	}
 });
 app.post('/createCamp', function(req, res){
 	sess = req.session;
-	var name = req.body.name;
-	var args = {
-		arg0: name,
-		arg1: sess.token
-	}
-	soap.createClient(url, function(err, client){
-		client.addCamp(args, function(err, result){
-			sess.error = err;
-			if(sess.error == null){
-				console.log("New camp created...");
-				sess.error = "Du har oprettet en camp";
-			}
-			res.redirect('/camp');
+	if(sess.token){
+		var name = req.body.name;
+		var args = {
+			arg0: name,
+			arg1: sess.token
+		}
+		soap.createClient(url, function(err, client){
+			client.addCamp(args, function(err, result){
+				sess.error = err;
+				if(sess.error == null){
+					console.log("New camp created...");
+					sess.error = "Du har oprettet en camp";
+				}
+				res.redirect('/camp');
+			});
 		});
-	});
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
+	}
 });
 app.post('/login', function(req, res){
 	var uname = req.body.username;
@@ -421,6 +519,7 @@ app.post('/users/create', function(req, res){
 	var uname = req.body.username;
 	var pass = req.body.password;
 	var repass = req.body.repassword;
+	var camp = req.body.selectpicker;
 	var admin = req.body.ans;
 	var token;
 	var error;
@@ -448,7 +547,7 @@ app.post('/users/create', function(req, res){
 				args = {
 					arg0: uname,
 					arg1: pass,
-					arg2: "hulabula",
+					arg2: camp,
 					arg3: admin,
 					arg4: token
 				}
@@ -464,105 +563,139 @@ app.post('/users/create', function(req, res){
 			});
 		}
 	}
-	if(!sess){
+	if(!sess.token){
 		res.redirect('/backLogin');
 	}else{
 		res.redirect('/users');
 	}
 });
-app.post('/quiz/answer',function(req, res){
-	sess = req.session;
-	var answer = req.body.ans;
-	sess.error = "Tak for svaret";
-	console.log(answer);
-	res.redirect('/quiz');
-});
 app.post('/comments',function(req, res){
 	sess = req.session;
-	sess.comments = [];
-	sess.singleID = req.body.message;
-	args = {
-		arg0: sess.singleID
-	}
-	soap.createClient(url, function(err, client){
-		client.getCommentsForMessage(args, function(err, result){
-			sess.error = err;
-			if(result != null){
-				var json = result.return;
-				for (var i = 0; i < json.length; i++) {
-					sess.comments[i] = json[i].text;
+	if(sess.token){
+		sess.comments = [];
+		sess.singleID = req.body.message;
+		args = {
+			arg0: sess.singleID
+		}
+		soap.createClient(url, function(err, client){
+			client.getCommentsForMessage(args, function(err, result){
+				sess.error = err;
+				if(result != null){
+					var json = result.return;
+					for (var i = 0; i < json.length; i++) {
+						sess.comments[i] = json[i].text;
+					}
+					console.log("Comments for message recieved...");
 				}
-				console.log("Comments for message recieved...");
-			}
+			});
 		});
-	});
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
+	}
 });
 app.get('/singleMessage.ejs', function(req, res){
 	sess = req.session;
-	args = {
-		arg0: sess.singleID
-	}
-	soap.createClient(url, function(err, client){
-		client.getMessage(args, function(err, result){
-			if(err == null){
-				var message = result.return.text;
-				res.render('singleMessage', {
-					title: "Kommentarer",
-					message: message,
-					comments: sess.comments,
-					error: sess.error
-				});
-			}else{
-				console.log(err);
-				res.render('singleMessage', {
-					title: "Kommentarer",
-					message: req.body.header,
-					comments: sess.comments,
-					error: err
-				});
+	if(sess.token){
+		if(sess.singleID == 0){
+			setTimeout(function() {
+				args = {
+					arg0: sess.singleID
+				}
+			}, 3000);
+		}else{
+			args = {
+				arg0: sess.singleID
+			}		
+		}
+		if(sess.comments.length >= 1){
+			if(sess.comments[0].messageId != sess.singleID){
+				sess.comments = [];
 			}
+		}
+		soap.createClient(url, function(err, client){
+			client.getMessage(args, function(err, result){
+				if(err == null){
+					var message = result.return.text;
+					res.render('singleMessage', {
+						title: "Kommentarer",
+						message: message,
+						comments: sess.comments,
+						error: sess.error
+					});
+				}else{
+					console.log(err);
+					res.render('singleMessage', {
+						title: "Kommentarer",
+						message: req.body.header,
+						comments: sess.comments,
+						error: err
+					});
+				}
+			});
 		});
-	});
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
+	}
 });
 app.post('/singleMessage.ejs', function(req, res){
 	sess = req.session;
-	var comment = req.body.message;
-	args = {
-		arg0: comment,
-		arg1: sess.singleID,
-		arg2: sess.token
+	if(sess.token){
+		var comment = req.body.message;
+		args = {
+			arg0: comment,
+			arg1: sess.singleID,
+			arg2: sess.token
+		}
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
 	}
 });
 app.post('/singleMessage/submit', function(req, res){
 	sess = req.session;
-	args = {
-		arg0: req.body.message,
-		arg1: sess.singleID,
-		arg2: sess.token
-	}
-	soap.createClient(url, function(err, client){
-		client.addComment(args, function(err, result){
-			if (err != null){
-				console.log(err);
-			}else{
-				console.log("Comment uploaded for message with id: " + sess.singleID);
-				args = {
-					arg0: sess.singleID
-				}
-				client.getCommentsForMessage(args, function(err, result){
-					sess.error = err;
-					if(result != null){
-						var json = result.return;
-						for (var i = 0; i < json.length; i++) {
-							sess.comments[i] = json[i].text;
-						}
-						console.log("Comments for message recieved...");
-						res.redirect('/singleMessage.ejs');
+	if(sess.token){
+		args = {
+			arg0: req.body.message,
+			arg1: sess.singleID,
+			arg2: sess.token
+		}
+		soap.createClient(url, function(err, client){
+			client.addComment(args, function(err, result){
+				if (err != null){
+					console.log(err);
+				}else{
+					console.log("Comment uploaded for message with id: " + sess.singleID);
+					args = {
+						arg0: sess.singleID
 					}
-				});
-			}
+					client.getCommentsForMessage(args, function(err, result){
+						sess.error = err;
+						if(result != null){
+							var json = result.return;
+							for (var i = 0; i < json.length; i++) {
+								sess.comments[i] = json[i].text;
+							}
+							console.log("Comments for message recieved...");
+							res.redirect('/singleMessage.ejs');
+						}
+					});
+				}
+			});
 		});
-	});
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: 'Session udløbet'
+		});
+	}
 });
 //Listen on serverport:
 app.listen(3000, function(){
