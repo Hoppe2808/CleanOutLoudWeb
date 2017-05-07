@@ -55,7 +55,7 @@ var sessionStore = new MySQLStore(options);
 
 app.use(session({
 	secret: 'ssshhhhh',
-	store: sessionStore,
+	//store: sessionStore,
   	resave: true,
   	saveUninitialized: true,
   	cookie: {
@@ -72,10 +72,15 @@ var sess;
 
 //Control pages:
 app.get('/', function(req, res){
-	res.render('login', {
-		title: 'Log Ind',
-		error: ''
-	});
+	sess = req.session; 
+	if(sess.token) {
+		res.redirect('/index');
+	}else{
+		res.render('login', {
+			title: 'Log Ind',
+			error: ''
+		});
+	}
 });
 app.post('/backLogin', function(req, res){
 	res.render('login', {
@@ -84,12 +89,14 @@ app.post('/backLogin', function(req, res){
 	});
 });
 app.get('/index', function(req, res){
+	sess = req.session;
 	res.render('index', {
 		title: 'Hovedmenu',
 		permission: sess.user.userType
 	});
 });
 app.post('/wall', function(req, res){
+	sess = req.session;
 	sess.error = "";
 	soap.createClient(url, function(err, client){
 		client.getWallMessages("", function(err, result){
@@ -112,6 +119,7 @@ app.post('/wall', function(req, res){
 	});
 });
 app.get('/wall', function(req, res){
+	sess = req.session;
 	sess.error = "";
 	soap.createClient(url, function(err, client){
 		client.getWallMessages("", function(err, result){
@@ -139,6 +147,7 @@ app.post('/writeMessage', function(req, res){
 	});
 });
 app.post('/writeMessage/submit', function(req, res){
+	sess = req.session;
 	var message = req.body.message;
 	var args = {
 		arg0: message,
@@ -155,6 +164,7 @@ app.post('/writeMessage/submit', function(req, res){
 	});
 });
 app.post('/trash', function(req, res){
+	sess = req.session;
 	soap.createClient(url, function(err, client){
 		client.getCampsSortedInWeight("", function(err, result){
 			sess.error = err;
@@ -177,6 +187,7 @@ app.post('/trash', function(req, res){
 	});
 });
 app.get('/trash', function(req, res){
+	sess = req.session;
 	res.render('trash', {
 		title: "Skralde Menu",
 		camps: sess.camps,
@@ -186,6 +197,7 @@ app.get('/trash', function(req, res){
 	});
 });
 app.post('/trash/add', function(req, res){
+	sess = req.session;
 	var camp = req.body.selectpicker;
 	var weightAdded = req.body.weight;
 	args = {
@@ -216,6 +228,7 @@ app.post('/trash/add', function(req, res){
 	});
 });
 app.get('/users', function(req, res){
+	sess = req.session;
 	if (sess){
 		res.render('users', {
 			title: "Bruger Menu",
@@ -231,6 +244,7 @@ app.get('/users', function(req, res){
 	}
 });
 app.post('/users', function(req, res){
+	sess = req.session;
 	if (sess){
 		res.render('users', {
 			title: "Bruger Menu",
@@ -253,6 +267,7 @@ app.post('/deleteUser', function(req, res){
 	});
 });
 app.post('/camp', function(req, res){
+	sess = req.session;
 	soap.createClient(url, function(err, client){
 		client.getCamps("", function(err, result){
 			sess.error = err;
@@ -269,6 +284,7 @@ app.post('/camp', function(req, res){
 	});	
 });
 app.get('/camp', function(req, res){
+	sess = req.session;
 	res.render('camps', {
 		title: "Camp Menu",
 		camps: sess.camps,
@@ -281,12 +297,14 @@ app.post('/events', function(req, res){
 	});
 });
 app.post('/back', function(req, res){
+	sess = req.session;
 	res.render('index', {
 		title: "Hovedmenu",
 		permission: sess.user.userType
 	});
 });
 app.post('/deleteCamp', function(req, res){
+	sess = req.session;
 	var name = req.body.selectpicker;
 	args = {
 		arg0: name,
@@ -300,6 +318,7 @@ app.post('/deleteCamp', function(req, res){
 	});
 });
 app.post('/createCamp', function(req, res){
+	sess = req.session;
 	var name = req.body.name;
 	var args = {
 		arg0: name,
@@ -337,10 +356,8 @@ app.post('/login', function(req, res){
 
 				//Create new session
 				sess = req.session;
-				sess.name = result.return;
 
-				sess.token = "";
-				sess.error = "";
+				//sess.name = result.return;
 				sess.messages = [];
 				sess.messageID = [];
 				sess.dates = [];
@@ -386,6 +403,7 @@ app.post('/login', function(req, res){
 	}
 });
 app.post('/logout', function(req, res){
+	sess = req.session;
 	sess.destroy(function(err){
 		sess = null;
 		if (err != null){
@@ -399,6 +417,7 @@ app.post('/logout', function(req, res){
 	});
 });
 app.post('/users/create', function(req, res){
+	sess = req.session;
 	var uname = req.body.username;
 	var pass = req.body.password;
 	var repass = req.body.repassword;
@@ -452,12 +471,14 @@ app.post('/users/create', function(req, res){
 	}
 });
 app.post('/quiz/answer',function(req, res){
+	sess = req.session;
 	var answer = req.body.ans;
 	sess.error = "Tak for svaret";
 	console.log(answer);
 	res.redirect('/quiz');
 });
 app.post('/comments',function(req, res){
+	sess = req.session;
 	sess.comments = [];
 	sess.singleID = req.body.message;
 	args = {
@@ -477,6 +498,7 @@ app.post('/comments',function(req, res){
 	});
 });
 app.get('/singleMessage.ejs', function(req, res){
+	sess = req.session;
 	args = {
 		arg0: sess.singleID
 	}
@@ -503,6 +525,7 @@ app.get('/singleMessage.ejs', function(req, res){
 	});
 });
 app.post('/singleMessage.ejs', function(req, res){
+	sess = req.session;
 	var comment = req.body.message;
 	args = {
 		arg0: comment,
@@ -511,6 +534,7 @@ app.post('/singleMessage.ejs', function(req, res){
 	}
 });
 app.post('/singleMessage/submit', function(req, res){
+	sess = req.session;
 	args = {
 		arg0: req.body.message,
 		arg1: sess.singleID,
