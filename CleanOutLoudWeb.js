@@ -511,7 +511,7 @@ app.get('/singleMessage.ejs', function(req, res){
 	}, 4000);
 	if(sess.token){
 		soap.createClient(url, function(err, client){
-			if(sess.singleID == null){
+			if(sess.singleID == null || sess.comments == []){
 				setTimeout(function(){
 					sess = req.session;	
 				}, 8000);
