@@ -502,27 +502,16 @@ app.post('/comments',function(req, res){
 				}
 				console.log("Comments for message recieved...");
 			}
+			res.end('{"success" : "Updated Successfully", "status" : 200}');
 		});
 	});	
 });
 app.get('/singleMessage.ejs', function(req, res){
-	setTimeout(function(){
-		sess = req.session;	
-	}, 4000);
+	sess = req.session;	
 	if(sess.token){
 		soap.createClient(url, function(err, client){
-			if(sess.singleID == null || sess.comments == []){
-				setTimeout(function(){
-					sess = req.session;	
-				}, 8000);
-			}
 			args = {
 				arg0: sess.singleID
-			}
-			if(sess.comments.length >= 1){
-				if(sess.comments[0].messageId != sess.singleID){
-					sess.comments = [];
-				}
 			}
 			client.getMessage(args, function(err, result){
 				if(err == null){

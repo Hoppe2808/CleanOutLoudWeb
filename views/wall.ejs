@@ -49,14 +49,14 @@ $(document).ready(function($) {
             data: JSON.stringify(data),
             contentType: 'application/json',
             url: '/comments',                      
-            success: function(data) {
+            success: function(result) {
                 console.log("Success...");
+                location.href = "singleMessage.ejs";
             },
             error: function (jqXHR, textStatus, thrownError) {
                 console.log(jqXHR);
             }
         });
-        location.href = "singleMessage.ejs";
     });
 });
     
