@@ -281,19 +281,26 @@ app.get('/users', function(req, res){
 			for (var i = 0; i < json.length; i++) {
 				camps[i] = json[i].campName;
 			}
+			var error;
 			if (sess.token){
+				if(sess.error != null){
+					error = JSON.stringify(sess.error.root.Envelope.Body.Fault.faultstring);
+				}
 				res.render('users', {
 					title: "Bruger Menu",
 					token: sess.token,
 					camps: camps,
-					error: JSON.stringify(sess.error.root.Envelope.Body.Fault.faultstring)
+					error: error
 				});
 			}else{
+				if(sess.error != null){
+					error = JSON.stringify(sess.error.root.Envelope.Body.Fault.faultstring);
+				}
 				res.render('users', {
 					title: "Bruger Menu",
 					token: "",
 					camps: camps,
-					error: JSON.stringify(sess.error.root.Envelope.Body.Fault.faultstring)
+					error: error
 				});
 			}
 		});
