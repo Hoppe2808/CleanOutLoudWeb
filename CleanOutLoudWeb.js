@@ -44,11 +44,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
 	secret: 'ssshhhhh',
 	resave: true,
-	saveUninitialized: true,
-	cookie: {
-		maxAge: 68000
-	}}
-	));
+	saveUninitialized: true
+}));
 
 //Global vars
 app.use(function(req, res, next){
@@ -511,13 +508,13 @@ app.post('/comments',function(req, res){
 app.get('/singleMessage.ejs', function(req, res){
 	setTimeout(function(){
 		sess = req.session;	
-	}, 2000);
+	}, 4000);
 	if(sess.token){
 		soap.createClient(url, function(err, client){
 			if(sess.singleID == null){
 				setTimeout(function(){
 					sess = req.session;	
-				}, 2000);
+				}, 8000);
 			}
 			args = {
 				arg0: sess.singleID
