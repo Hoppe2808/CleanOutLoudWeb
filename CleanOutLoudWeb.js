@@ -281,9 +281,10 @@ app.get('/users', function(req, res){
 			for (var i = 0; i < json.length; i++) {
 				camps[i] = json[i].campName;
 			}
-			var error;
+			var error = "";
 			if (sess.token){
-				if(sess.error != null){
+				if(sess.error != null && sess.error != "Bruger Oprettet"){
+					console.log("Test " + sess.error);
 					error = JSON.stringify(sess.error.root.Envelope.Body.Fault.faultstring);
 				}
 				res.render('users', {
@@ -293,7 +294,8 @@ app.get('/users', function(req, res){
 					error: error
 				});
 			}else{
-				if(sess.error != null){
+				if(sess.error != null && sess.error != "Bruger Oprettet"){
+					console.log("Test " + sess.error);
 					error = JSON.stringify(sess.error.root.Envelope.Body.Fault.faultstring);
 				}
 				res.render('users', {
