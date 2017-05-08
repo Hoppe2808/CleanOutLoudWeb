@@ -39,8 +39,10 @@
 $(document).ready(function($) {
     $(".clickableRow").click(function() {
         var message = $(this).find(".message").attr('id');
-        var data = {};
-        data.message = message;
+        var data = {
+            message: message
+        };
+        var success = true;
         
         $.ajax({
             type: 'POST',
@@ -48,7 +50,10 @@ $(document).ready(function($) {
             contentType: 'application/json',
             url: '/comments',                      
             success: function(data) {
-                console.log('success');
+                console.log("Success...");
+            },
+            error: function (jqXHR, textStatus, thrownError) {
+                console.log(jqXHR);
             }
         });
         location.href = "singleMessage.ejs";

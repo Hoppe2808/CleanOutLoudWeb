@@ -13,18 +13,6 @@
         <div class="well main">
             <h3><%= title %></h3>
             <br>
-            <h4>Slet camp</h4>
-            <form method="POST" action="/deleteCamp">
-                <label>Camp:
-                <select class="selectpicker" name="selectpicker">
-                    <% for (var i = 0; i < camps.length; i++) { %>
-                        <option><%= camps[i] %></option>
-                    <% } %>
-                </select></label>
-                <br>
-                <input class="btn btn-danger" type="submit" value="Slet">  
-            </form>
-            <br><br>
             <h4>Opret camp</h4>
             <div style="width: 50%; margin: 0 auto;">
             <form method="POST" action="/createCamp">

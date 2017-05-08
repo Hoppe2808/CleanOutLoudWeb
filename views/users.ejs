@@ -45,18 +45,11 @@
                 </div>
                 <br><% } %>
                 <input class="btn btn-success" type="submit" value="Opret bruger">
+                <br><br>
             </form><% if (token != null) { %>
-            <hr style="border-top: 1px solid #8c8b8b">
-            <h4>Slet bruger</h4>
-            <form method="POST" action="/deleteUser">
-                <input class="form-control" type="text" name="username" placeholder="Brugernavn" style="width: 50%; margin: 0 auto">
-                <br>
-                <input class="btn btn-danger" type="submit" value="Slet">  
-            </form><br><br>
             <form method="POST" action="/back">
                 <input class="btn btn-default" type="submit" value="Tilbage">
             </form><% }else{ %>
-            <br><br>
             <form method="POST" action="/backLogin">
                 <input class="btn btn-default" type="submit" value="Tilbage">
             </form>
