@@ -316,14 +316,14 @@ app.post('/users', function(req, res){
 					title: "Bruger Menu",
 					token: sess.token,
 					camps: camps,
-					error: JSON.stringify(sess.error.root.Envelope.Body.Fault.faultstring)
+					error: sess.error
 				});
 			}else{
 				res.render('users', {
 					title: "Bruger Menu",
 					token: "",
 					camps: camps,
-					error: JSON.stringify(sess.error.root.Envelope.Body.Fault.faultstring)
+					error: ""
 				});
 			}
 		});
@@ -505,6 +505,11 @@ app.get('/singleMessage.ejs', function(req, res){
 	}, 2000);
 	if(sess.token){
 		soap.createClient(url, function(err, client){
+			if(sess.singleID == null){
+				setTimeout(function(){
+					sess = req.session;	
+				}, 2000);
+			}
 			args = {
 				arg0: sess.singleID
 			}
